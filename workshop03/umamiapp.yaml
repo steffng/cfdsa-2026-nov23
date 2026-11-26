@@ -1,0 +1,54 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: umamiapp-deploy
+  namespace: workshop03
+spec:
+  replicas: 1
+  selector:
+    matchLabels: &umamiapp-labels
+      app: umami
+      tier: app
+      env: workshop
+  template:
+    metadata:
+      labels:
+        <<: *umamiapp-labels
+    spec:
+      containers:
+      - name: umamaiapp-container
+        image: ghcr.io/umami-software/umami:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 3000
+        envFrom:
+        - configMapRef:
+            name: umami-cm
+        - secretRef:
+            name: umami-secret
+        env:
+        - name: DATABASE_URL
+          value: postgresql://$(POSTGRES_USER):$(POSTGRES_PASSWORD)@umamidb-svc.workshop03.svc.cluster.local:5432/$(POSTGRES_DB)
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "256m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: umamiapp-svc
+  namespace: workshop03
+spec:
+  selector:
+    app: umami
+    tier: app
+    env: workshop
+  type: ClusterIP
+  ports:
+  - port: 3000
+    targetPort: 3000

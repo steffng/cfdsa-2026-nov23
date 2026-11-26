@@ -1,0 +1,29 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: workshop04
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: rustfs-cm
+  namespace: workshop04
+data:
+  s3-port: "9000"
+  web-port: "9001"
+  network: s3net
+  RUSTFS_ADDRESS_IP: 0.0.0.0
+  RUSTFS_CONSOLE_ADDRESS_IP: 0.0.0.0
+  RUSTFS_CONSOLE_ENABLE: 'true'
+  RUSTFS_ACCESS_KEY: admin
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: rustfs-secret
+  namespace: workshop04
+data:
+  RUSTFS_SECRET_KEY: YWRtaW5hZG1pbjEyMzQ= # adminadmin1234
